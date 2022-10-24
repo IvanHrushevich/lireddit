@@ -3,7 +3,7 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 @Entity()
 export class Post {
   @PrimaryKey()
-  id!: number;
+  id: string;
 
   @Property({ type: 'date' })
   createdAt?: Date = new Date();
@@ -12,5 +12,5 @@ export class Post {
   updatedAt?: Date = new Date();
 
   @Property({ type: 'text' })
-  title!: string;
+  title: string;
 }
