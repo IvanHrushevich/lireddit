@@ -55,4 +55,19 @@ export class PostResolver {
 
     return post;
   }
+
+  @Mutation(() => Boolean)
+  async deletePost(
+    @Arg('id')
+    id: string,
+    @Ctx()
+    ctx: MyContext
+  ): Promise<boolean> {
+    try {
+      await ctx.emFork.nativeDelete(Post, { id });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 }
