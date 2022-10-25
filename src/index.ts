@@ -1,3 +1,4 @@
+import { UserResolver } from './resolvers/user';
 import { Connection, EntityManager, IDatabaseDriver, MikroORM } from '@mikro-orm/core';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
@@ -22,7 +23,7 @@ const main = async () => {
   // GraphQL server
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, PostResolver],
+      resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
     context: () => ({ emFork }),
