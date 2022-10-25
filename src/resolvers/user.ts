@@ -59,7 +59,10 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
-  async login(@Arg('options') options: UsernamePasswordInput, @Ctx() { emFork }: MyContext): Promise<UserResponse> {
+  async login(
+    @Arg('options') options: UsernamePasswordInput,
+    @Ctx() { emFork, req }: MyContext
+  ): Promise<UserResponse> {
     const user = await emFork.findOne(User, { username: options.username });
     if (!user) {
       return { errors: [{ field: 'username', message: "username doesn't exist" }] };
@@ -69,6 +72,8 @@ export class UserResolver {
     if (!isPasswordValid) {
       return { errors: [{ field: 'password', message: 'incorrect password' }] };
     }
+
+    req.session.userId = user.id;
 
     return { user };
   }

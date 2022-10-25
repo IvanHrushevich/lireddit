@@ -1,13 +1,25 @@
-import { UserResolver } from './resolvers/user';
+import 'reflect-metadata';
+
 import { Connection, EntityManager, IDatabaseDriver, MikroORM } from '@mikro-orm/core';
 import { ApolloServer } from 'apollo-server-express';
+import connectRedis from 'connect-redis';
 import express from 'express';
-import 'reflect-metadata';
-import { buildSchema } from 'type-graphql';
+import session from 'express-session';
+import { createClient } from 'redis';
 
+import { buildSchema } from 'type-graphql';
+import { __prod__ } from './constants';
 import mikroOrmConfig from './mikro-orm.config';
 import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
+import { UserResolver } from './resolvers/user';
+import { MyContext } from './types';
+
+let RedisStore = connectRedis(session);
+let redisClient = createClient({ legacyMode: true });
+redisClient.connect().catch((err) => {
+  console.error('redis error', err);
+});
 
 const main = async () => {
   const orm = await MikroORM.init(mikroOrmConfig);
@@ -20,13 +32,30 @@ const main = async () => {
 
   const app = express();
 
+  // redis
+  app.use(
+    session({
+      name: 'qid',
+      store: new RedisStore({ client: redisClient, disableTouch: true }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        httpOnly: true,
+        sameSite: 'lax', //csrf
+        secure: __prod__, // if true: cookie only works in https
+      },
+      saveUninitialized: false,
+      secret: 'keyboard cat',
+      resave: false,
+    })
+  );
+
   // GraphQL server
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: () => ({ emFork }),
+    context: ({ req, res }): MyContext => ({ emFork, req, res }),
   });
   await apolloServer.start();
   apolloServer.applyMiddleware({ app });
