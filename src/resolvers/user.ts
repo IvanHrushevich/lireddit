@@ -48,7 +48,10 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
-  async register(@Arg('options') options: UsernamePasswordInput, @Ctx() { emFork }: MyContext): Promise<UserResponse> {
+  async register(
+    @Arg('options') options: UsernamePasswordInput,
+    @Ctx() { emFork, req }: MyContext
+  ): Promise<UserResponse> {
     //validation
     if (options.username.length <= 2) {
       return { errors: [{ field: 'username', message: 'length must be greater that 2' }] };
@@ -68,6 +71,10 @@ export class UserResolver {
       }
     }
 
+    // this will set a cookie on the user
+    // and keep them logged in
+    req.session.userId = user.id;
+
     return { user };
   }
 
@@ -86,6 +93,8 @@ export class UserResolver {
       return { errors: [{ field: 'password', message: 'incorrect password' }] };
     }
 
+    // this will set a cookie on the user
+    // and keep them logged in
     req.session.userId = user.id;
 
     return { user };
