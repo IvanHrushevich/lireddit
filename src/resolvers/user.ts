@@ -1,4 +1,4 @@
-import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Resolver } from 'type-graphql';
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { v4 as uuidv4 } from 'uuid';
 import argon2 from 'argon2';
 
@@ -34,6 +34,19 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { req, emFork }: MyContext) {
+    const userIdFromSession = req.session.userId;
+
+    // user is not logged in (there is no cookie)
+    if (!userIdFromSession) {
+      return null;
+    }
+
+    const user = await emFork.findOne(User, { id: userIdFromSession });
+    return user;
+  }
+
   @Mutation(() => UserResponse)
   async register(@Arg('options') options: UsernamePasswordInput, @Ctx() { emFork }: MyContext): Promise<UserResponse> {
     //validation
