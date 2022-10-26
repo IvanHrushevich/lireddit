@@ -6,6 +6,7 @@ import connectRedis from 'connect-redis';
 import express from 'express';
 import session from 'express-session';
 import { createClient } from 'redis';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 
 import { buildSchema } from 'type-graphql';
 import { __prod__ } from './constants';
@@ -49,12 +50,13 @@ const main = async () => {
     })
   );
 
-  // GraphQL server
+  // GraphQL Apollo server
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
     context: ({ req, res }): MyContext => ({ emFork, req, res }),
   });
   await apolloServer.start();
