@@ -7,6 +7,7 @@ import express from 'express';
 import session from 'express-session';
 import { createClient } from 'redis';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import cors from 'cors';
 
 import { buildSchema } from 'type-graphql';
 import { __prod__ } from './constants';
@@ -32,6 +33,9 @@ const main = async () => {
   await generator.updateSchema();
 
   const app = express();
+
+  // cors
+  app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
   // redis
   app.use(
@@ -60,7 +64,7 @@ const main = async () => {
     context: ({ req, res }): MyContext => ({ emFork, req, res }),
   });
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log('server is started on port 4000');
