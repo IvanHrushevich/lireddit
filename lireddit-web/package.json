@@ -4,7 +4,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "run:prettier": "prettier --write ."
+    "run:prettier": "prettier --write .",
+    "gen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.2",
@@ -21,6 +22,9 @@
     "urql": "^3.0.3"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.13.7",
+    "@graphql-codegen/client-preset": "1.1.1",
+    "@graphql-codegen/typescript-urql": "^3.7.2",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",

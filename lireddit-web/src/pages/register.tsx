@@ -26,7 +26,13 @@ const register: FC = () => {
 
   return (
     <Wrapper variant="small">
-      <Formik initialValues={{ username: '', password: '' }} onSubmit={register}>
+      <Formik
+        initialValues={{ username: '', password: '' }}
+        onSubmit={async (values) => {
+          const response = await register(values);
+          console.log('response', response);
+        }}
+      >
         {({ isSubmitting }) => (
           <Form>
             <InputField name="username" label="User Name" placeholder="User Name" />
