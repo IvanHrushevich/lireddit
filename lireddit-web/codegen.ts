@@ -8,7 +8,7 @@ const config: CodegenConfig = {
     // maybe update later on
     'src/generated/': {
       preset: 'client',
-      plugins: [],
+      plugins: ['typescript-urql'],
     },
   },
 };
